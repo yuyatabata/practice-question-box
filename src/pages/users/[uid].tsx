@@ -2,6 +2,7 @@ import { useRouter } from "next/dist/client/router";
 import { useEffect, useState } from "react";
 import { User } from "../../models/User";
 import { collection, doc, getDoc, getFirestore } from "firebase/firestore";
+import Layout from "../../components/Layout";
 
 type Query = {
   uid: string;
@@ -14,14 +15,14 @@ const UserShow = () => {
 
   useEffect(() => {
     const loadUser = async () => {
-      console.log(query);
       if (query.uid === undefined) {
         return;
       }
 
       const db = getFirestore();
-      const ref = doc(collection(db, "user"), query.uid);
+      const ref = doc(collection(db, "users"), query.uid);
       const userDoc = await getDoc(ref);
+      console.log(userDoc.data());
 
       if (!userDoc.exists()) {
         console.log("returned");
@@ -35,7 +36,16 @@ const UserShow = () => {
     loadUser();
   }, [query.uid]);
 
-  return <div>{user ? user.name : "Loading..."}</div>;
+  return (
+    <Layout>
+      {user && (
+        <div className="text-center">
+          <h1 className="h4">{user.name}さんのページ</h1>
+          <div className="m-5">{user.name}さんに質問しよう！</div>
+        </div>
+      )}
+    </Layout>
+  );
 };
 
 export default UserShow;
