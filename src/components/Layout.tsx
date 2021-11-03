@@ -1,4 +1,6 @@
-const Layout = (children) => (
+import { ToastContainer } from "react-toastify";
+
+const Layout = ({ children }) => (
   <div>
     <nav
       className="navbar navbar-expand-lg navbar-light mb-3"
@@ -18,6 +20,7 @@ const Layout = (children) => (
       </div>
     </nav>
     <div className="container">{children}</div>
+    <ToastContainer />
   </div>
 );
 
