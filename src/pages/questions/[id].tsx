@@ -1,0 +1,50 @@
+import { useEffect, useState } from "react";
+import { useRouter } from "next/dist/client/router";
+import {
+  collection,
+  doc,
+  getDoc,
+  getDocs,
+  getFirestore,
+  limit,
+  query,
+  runTransaction,
+  serverTimestamp,
+  Timestamp,
+  where,
+} from "firebase/firestore";
+import Layout from "../../components/Layout";
+import { Question } from "../../models/Question";
+import { useAuthentication } from "../../hooks/authentication";
+
+type Query = {
+  id: string;
+};
+
+const QuestionsShow = () => {
+  const router = useRouter();
+  const routerQuery = router.query as Query;
+  const { user } = useAuthentication();
+  const [question, setQuestion] = useState<Question>(null);
+
+  const getCollections = () => {
+    const db = getFirestore();
+    return {
+      db,
+      questionsCollection: collection(db, "questions"),
+      answersCollection: collection(db, "answers"),
+    };
+  };
+
+  const loadData = async () => {
+    if (routerQuery.id === undefined) {
+      return;
+    }
+
+    const { questionsCollection, answersCollection } = getCollections();
+    const questionDoc = await getDoc(doc(questionsCollection, routerQuery.id));
+    if (!questionDoc.exists()) {
+      return;
+    }
+  };
+};
