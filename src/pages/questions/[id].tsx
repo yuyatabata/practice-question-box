@@ -46,5 +46,27 @@ const QuestionsShow = () => {
     if (!questionDoc.exists()) {
       return;
     }
+
+    const gotQuestion = questionDoc.data() as Question;
+    gotQuestion.id = questionDoc.id;
+    setQuestion(gotQuestion);
   };
+
+  useEffect(() => {
+    loadData();
+  }, [routerQuery.id]);
+
+  return (
+    <Layout>
+      <div className="row justify-content-center">
+        <div className="col-12 col-md-6">
+          {question && (
+            <div className="card">
+              <div className="card-body">{question.body}</div>
+            </div>
+          )}
+        </div>
+      </div>
+    </Layout>
+  );
 };
