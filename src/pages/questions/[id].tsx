@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 import { useRouter } from "next/dist/client/router";
 import {
   collection,
@@ -26,6 +26,8 @@ const QuestionsShow = () => {
   const routerQuery = router.query as Query;
   const { user } = useAuthentication();
   const [question, setQuestion] = useState<Question>(null);
+  const [isSending, setIsSending] = useState(false);
+  const [body, setBody] = useState("");
 
   const getCollections = () => {
     const db = getFirestore();
@@ -56,6 +58,28 @@ const QuestionsShow = () => {
     loadData();
   }, [routerQuery.id]);
 
+  const onSubmit = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setIsSending(true);
+
+    const { db, questionsCollection, answersCollection } = getCollections();
+    const answerRef = doc(answersCollection);
+
+    await runTransaction(db, async (t) => {
+      t.set(answerRef, {
+        uid: user.uid,
+        questionId: question.id,
+        body,
+        createdAt: serverTimestamp(),
+      });
+      t.update(doc(questionsCollection, question.id), {
+        isReplied: true,
+      });
+    });
+
+    setIsSending(false);
+  };
+
   return (
     <Layout>
       <div className="row justify-content-center">
@@ -67,6 +91,34 @@ const QuestionsShow = () => {
           )}
         </div>
       </div>
+      <section className="text-center mt-4">
+        <h2 className="h4">回答する</h2>
+
+        <form onSubmit={onSubmit}>
+          <textarea
+            className="form-control"
+            placeholder="おげんきですか？"
+            rows={6}
+            value={body}
+            onChange={(e) => setBody(e.target.value)}
+            required
+          ></textarea>
+          <div className="m-3">
+            {isSending ? (
+              <div
+                className="spinner-border text-secondary"
+                role="status"
+              ></div>
+            ) : (
+              <button type="submit" className="btn btn-primary">
+                回答する
+              </button>
+            )}
+          </div>
+        </form>
+      </section>
     </Layout>
   );
 };
+
+export default QuestionsShow;
