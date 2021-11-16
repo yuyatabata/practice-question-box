@@ -76,8 +76,12 @@ const QuestionsShow = () => {
   };
 
   useEffect(() => {
+    if (user === null) {
+      return;
+    }
+
     loadData();
-  }, [routerQuery.id]);
+  }, [routerQuery.id, user]);
 
   const onSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
