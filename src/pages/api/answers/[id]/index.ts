@@ -10,9 +10,11 @@ type Data = {
 }
 
 export default async (req: NextApiRequest, res: NextApiResponse<Data>) => {
-  const id = res.query.id as string
+  const id = req.query.id as string
+  console.log('id', id)
 
   const answerDoc = await firestore().collection('answers').doc(id).get()
+  console.log('answerDoc',answerDoc.data())
   const answer = answerDoc.data() as Answer
   answer.id = answerDoc.id
 
