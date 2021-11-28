@@ -1,8 +1,8 @@
-import { NextApiRequest, NextApiResponse } from "next";
+import { NextApiRequest, NextApiResponse } from 'next'
 import '../../../../lib/firebase_admin'
-import { firestore } from "firebase-admin";
-import { Answer } from "../../../../models/Answer";
-import { Question } from "../../../../models/Question";
+import { firestore } from 'firebase-admin'
+import { Answer } from './../../../../models/Answer'
+import { Question } from './../../../../models/Question'
 
 type Data = {
   answer: Answer
@@ -11,14 +11,15 @@ type Data = {
 
 export default async (req: NextApiRequest, res: NextApiResponse<Data>) => {
   const id = req.query.id as string
-  console.log('id', id)
 
   const answerDoc = await firestore().collection('answers').doc(id).get()
-  console.log('answerDoc',answerDoc.data())
   const answer = answerDoc.data() as Answer
   answer.id = answerDoc.id
 
-  const questionDoc = await firestore().collection('questions').doc(answer.questionId).get()
+  const questionDoc = await firestore()
+    .collection('questions')
+    .doc(answer.questionId)
+    .get()
   const question = questionDoc.data() as Question
   question.id = questionDoc.id
 
