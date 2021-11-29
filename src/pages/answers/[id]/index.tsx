@@ -7,32 +7,44 @@ type Props = {
   question: Question;
 };
 
+const getDescription = (answer: Answer) => {
+  const body = answer.body.trim().replace(/[ \r\n]/g, "");
+  if (body.length < 140) {
+    return body;
+  }
+  return body.substring(0, 140) + "...";
+};
+
 export const getServerSideProps = async ({ query }) => {
   const res = await fetch(process.env.API_URL + `/api/answers/${query.id}`);
   const json = await res.json();
   return { props: json };
 };
 
-const AnswersShow = (props: Props) => (
-  <Layout>
-    <div className="row justify-content-center">
-      <div className="col-12 col-md-6">
-        <>
-          <div className="card">
-            <div className="card-body">{props.question.body}</div>
-          </div>
+const AnswersShow = (props: Props) => {
+  const description = getDescription(props.answer);
 
-          <section className="text-center mt-4">
-            <h2 className="h4">回答</h2>
-
+  return (
+    <Layout>
+      <div className="row justify-content-center">
+        <div className="col-12 col-md-6">
+          <>
             <div className="card">
-              <div className="card-body text-left">{props.answer.body}</div>
+              <div className="card-body">{props.question.body}</div>
             </div>
-          </section>
-        </>
+
+            <section className="text-center mt-4">
+              <h2 className="h4">回答</h2>
+
+              <div className="card">
+                <div className="card-body text-left">{props.answer.body}</div>
+              </div>
+            </section>
+          </>
+        </div>
       </div>
-    </div>
-  </Layout>
-);
+    </Layout>
+  );
+};
 
 export default AnswersShow;
